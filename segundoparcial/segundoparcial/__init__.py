@@ -32,10 +32,10 @@ def genPrimes(max_num): # valid to 2^32
     while p < max_num:
         p = p + wheel[w]
         w = 4 if w == 51 else w + 1
-        if isPrime(p): 
+        if isPrime(p) and p <= max_num: 
             yield p
 
-@api.route("/prime/<int:number>")
+@api.route("/prime/<int:number>/json")
 @api.param("number", description="Returns a list of numbers from 2 to the number passed as parameter as a json", _in="path", required=True, type="Integer")
 class Prime(Resource):
     def get(self, number):
