@@ -1,12 +1,22 @@
 """
 The flask application package.
 """
-
+import sqlite3
+from functools import reduce
 from flask import Flask
 from flask_restplus import Api, Resource
 
 app = Flask(__name__)
 api = Api(app, title="Api números primos", version="1.0.0", doc="/doc/")
+
+db_con = sqlite3.connect("prime.db")
+cursor = db_con.cursor()
+cursor.execute("""
+    CREATE TABLE IF NOT EXISTS PRIMES (
+    NUMBER INT PRIMARY KEY,
+    RESULT TEXT NOT NULL
+    )
+""")
 
 def genPrimes(max_num): # valid to 2^32
     def isPrime(n):
@@ -39,6 +49,12 @@ def genPrimes(max_num): # valid to 2^32
 @api.param("number", description="Returns a list of numbers from 2 to the number passed as parameter as a json", _in="path", required=True, type="Integer")
 class Prime(Resource):
     def get(self, number):
-        return list(genPrimes(number))  # Flask-restplus assumes json so it tries to convert what I return here to json.
+        query = list(cursor.execute("SELECT RESULT FROM PRIMES WHERE NUMBER = {n};".format(n=number)))
+        if query:
+            return query
+        else:
+            result = list(genPrimes(number))
+            cursor.execute("""INSERT INTO PRIMES VALUES ({n}, "{r}")""".format(n=number, r=reduce(lambda x, y: str(x) + "," + str(y), result)))
+            return result  # Flask-restplus assumes json so it tries to convert what I return here to json.
 
 import segundoparcial.views
