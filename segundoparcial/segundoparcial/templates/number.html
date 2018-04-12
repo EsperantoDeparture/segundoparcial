@@ -1,0 +1,19 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+    {% block content %}
+
+    <h1>Prime numbers from 2 to {{ number }}</h1>
+    {% for n in numbers %}
+        <ul>
+            <li>{{ n }}</li>
+        </ul>
+    {% endfor %}
+    {% endblock %}
+</body>
+</html>
